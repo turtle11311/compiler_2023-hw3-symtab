@@ -6,6 +6,7 @@
 #define REDEF_ARG "%d:%d: redefined argument %s\n"
 #define REDEF_VAR "%d:%d: redefined variable %s\n"
 #define UNDEC_VAR "%d:%d: undeclared variable %s\n"
+#define UNDEC_FUN "%d:%d: undeclared function %s\n"
 #define ARITH_TYPE "%d:%d: type errors in arithmetic expressions %s\n"
 #define ASSIG_TYPE "%d:%d: type errors on assignment statement\n"
 #define INDEX_TYPE "%d:%d: array indexing must be integer\n"
