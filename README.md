@@ -9,6 +9,7 @@ In the Assignment, you need to define some nodes to construct your Abstract Synt
 The format of messages that you need to print have already been defined in `include/info.h`, some warnings about semantic error should be output to `stderr`, and the symbol table related message need to be output to `stdout`, as stated in the header file.
 
 Hints:
+
 0. You may construct the AST first
 1. Make symbol table by traversing your AST
 2. Do semantic analysis, don't forget type check
