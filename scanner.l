@@ -121,6 +121,11 @@ Z [zZ]
 
   /* define pragma here */
 
+ /*
+    yylval.text = strdup, strndup ... (yytext)
+    yylval.dval = atoi, atof, strtod, strtol ... (yytext)
+ */
+
 [ \t\f\r]    LIST;
 
 \n {

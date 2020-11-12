@@ -48,7 +48,16 @@ extern int yylex_destroy(void);
 %%
 
     /* define your snytax here */
-prog: PROGRAM { root = NULL; }
+    /* @n return the sturct LocType of "n-th node", ex: @1 return the PROGRAM node's locType
+       $n return the $$ result you assigned to the rule, ex: $1 */
+prog : PROGRAM {
+        root = NULL;
+        /*
+        printf("program node is @ line: %d, column: %d\n",
+                    @1.first_line, @1.first_column");
+        yylval.val, yylval.text, yylval.dval to get the data (type defined in %union) you assigned by scanner.
+        */
+    }
     ;
 
 %%
