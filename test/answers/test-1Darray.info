@@ -12,6 +12,6 @@
 15:5: undeclared variable y
 15:15: undeclared variable x
 15:17: undeclared variable y
-16:1: undeclared variable writeln
+16:1: undeclared function writeln
 16:11: undeclared variable x
 16:13: undeclared variable y
