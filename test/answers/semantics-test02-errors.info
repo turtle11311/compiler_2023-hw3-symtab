@@ -1,5 +1,5 @@
-15:3: redefined variable a
-20:6: redefined variable a
+15:7: redefined variable a
+20:10: redefined variable a
 23:6: undeclared variable qqq
 23:12: undeclared variable rrr
 24:13: undeclared function f
