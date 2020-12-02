@@ -43,7 +43,7 @@ extern int yylex_destroy(void);
   Node node;
 }
 
-%type <Node> prog
+%type <node> prog
 
 %%
 
