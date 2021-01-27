@@ -25,7 +25,7 @@ int fileno(FILE *);
     do{ LIST; \
         if(opt_token) \
         fprintf(stderr, "token(type:%-10s) on line %4d, %3d : %s\n", \
-            #TYPE, line_no, col_no - yyleng + 1, yytext); \
+            #TYPE, line_no, col_no - yyleng, yytext); \
     } while(0)
 
 #ifdef __cplusplus
@@ -33,7 +33,7 @@ extern "C" int yylex(void);
 #endif
 
 int opt_list = 1, opt_token = 0;
-int line_no = 1, col_no = 0;
+int line_no = 1, col_no = 1;
 char buffer[MAX_LINE_LENG];
 
 %}
@@ -131,7 +131,7 @@ Z [zZ]
 \n {
   LIST;
   LIST_FLUSH;
-  line_no++, col_no = 0;
+  line_no++, col_no = 1;
 }
 
-.  { LIST; fprintf(stderr, "[ERROR] line %4d:%3d lexical analyzer error %s\n", line_no, col_no-(int)yyleng+1, yytext); }
+.  { LIST; fprintf(stderr, "[ERROR] line %4d:%3d lexical analyzer error %s\n", line_no, col_no - yyleng, yytext); }

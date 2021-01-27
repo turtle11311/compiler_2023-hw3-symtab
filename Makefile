@@ -42,9 +42,6 @@ prepare:
 test: all
 	make test -C test/
 
-check: all
-	make check -C test/
-
 pack:
 	make clean
 	zip -r icd20-hw3.zip . -x ".*" -x "*.zip" -x "test/*"

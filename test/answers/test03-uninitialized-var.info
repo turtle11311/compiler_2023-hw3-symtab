@@ -1,4 +1,4 @@
-7:4: missing return value of function kl
-9:4: undeclared variable op
-15:5: undeclared variable op
-16:5: undeclared variable op
+7:5: missing return value of function kl
+9:5: undeclared variable op
+15:6: undeclared variable op
+16:6: undeclared variable op
