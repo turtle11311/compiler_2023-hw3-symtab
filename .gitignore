@@ -1,0 +1,16 @@
+# generated files
+## Test
+test/output
+## parser
+parser
+parser.o
+parser.c
+parser.h
+parser.d
+parser.output
+## scanner
+scanner.c
+scanner.o
+scanner.d
+## handin file
+510557011-parser.zip

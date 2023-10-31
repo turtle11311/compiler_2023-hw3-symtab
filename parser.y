@@ -28,13 +28,34 @@ extern int yylex_destroy(void);
 
 %}
 
-%locations
+%token KPROGRAM
+%token IDENTIFIER
+%token LPAREN RPAREN
+%token SEMICOLON COLON DOT COMMA
+%token KVAR
+%token KARRAY
+%token LBRAC RBRAC
+%token NUM
+%token KSTRING
+%token STRINGCONST
+%token KOF
+%token KINTEGER
+%token KREAL
+%token KFUNCTION
+%token KPROCEDURE
+%token KBEGIN KEND
+%token ASSIGNMENT
+%token KIF KTHEN KELSE
+%token KWHILE KDO
+%token LESS GREATER LESSEQUAL GREATEREQUAL EQUAL NOTEQUAL
+%token PLUS MINUS
+%token STAR SLASH
+%token KNOT DOTDOT
+%token KAND KOR
 
-%token PROGRAM VAR ARRAY OF INTEGER REAL STRING FUNCTION PROCEDURE PBEGIN END IF THEN ELSE WHILE DO NOT AND OR
-
-%token LPAREN RPAREN SEMICOLON DOT COMMA COLON LBRACE RBRACE DOTDOT ASSIGNMENT ADDOP SUBOP MULOP DIVOP LTOP GTOP EQOP GETOP LETOP NEQOP
-
-%token IDENTIFIER REALNUMBER INTEGERNUM SCIENTIFIC LITERALSTR
+%left PLUS MINUS
+%left STAR SLASH
+%left Uaddop
 
 %union {
   int val;
@@ -48,17 +69,124 @@ extern int yylex_destroy(void);
 %%
 
     /* define your snytax here */
-    /* @n return the sturct LocType of "n-th node", ex: @1 return the PROGRAM node's locType
-       $n return the $$ result you assigned to the rule, ex: $1 */
-prog : PROGRAM {
-        root = NULL;
-        /*
-        printf("program node is @ line: %d, column: %d\n",
-                    @1.first_line, @1.first_column);
-        yylval.val, yylval.text, yylval.dval to get the data (type defined in %union) you assigned by scanner.
-        */
-    }
+program: KPROGRAM IDENTIFIER LPAREN identifier_list RPAREN SEMICOLON
+         declarations
+         subprogram_declarations
+         compound_statement
+         DOT
+        {
+            root = NULL;
+            /*
+            printf("program node is @ line: %d, column: %d\n",
+                        @1.first_line, @1.first_column);
+            yylval.val, yylval.text, yylval.dval to get the data (type defined in %union) you assigned by scanner.
+            */
+        };
+
+identifier_list: IDENTIFIER 
+               | identifier_list COMMA IDENTIFIER
+               ;
+
+declarations: declarations KVAR identifier_list COLON type SEMICOLON
+            |
+            ;
+
+type: standard_type
+    | KARRAY LBRAC NUM DOTDOT NUM RBRAC KOF type
     ;
+
+standard_type: KINTEGER | KREAL | KSTRING;
+
+subprogram_declarations: subprogram_declarations subprogram_declaration SEMICOLON
+                       |
+                       ;
+ 
+subprogram_declaration: subprogram_head
+                        declarations
+                        subprogram_declarations
+                        compound_statement
+                      ;
+
+subprogram_head: KFUNCTION IDENTIFIER arguments COLON standard_type SEMICOLON
+               | KPROCEDURE IDENTIFIER arguments SEMICOLON
+               ;
+
+arguments: LPAREN parameter_list RPAREN
+         |
+         ;
+
+parameter_list: optional_var identifier_list COLON type
+              | optional_var identifier_list COLON type SEMICOLON parameter_list
+              ;
+
+optional_var: KVAR
+            |
+            ;
+
+compound_statement: KBEGIN
+                    statement_list
+                    KEND
+                  ;
+
+statement_list: statement_list SEMICOLON statement
+              | statement
+              ;
+
+statement: variable ASSIGNMENT expression
+         | procedure_statement
+         | compound_statement
+         | KIF expression KTHEN statement KELSE statement
+         | KWHILE expression KDO statement
+         |
+         ;
+
+variable: IDENTIFIER tail
+        ;
+      
+tail: LBRAC expression RBRAC tail
+    |
+    ;
+
+procedure_statement: IDENTIFIER
+                   | IDENTIFIER LPAREN expression_list RPAREN
+                   ;
+
+expression_list: expression 
+               | expression_list COMMA expression
+               ;
+
+expression: boolexpression
+          | boolexpression KAND boolexpression
+          | boolexpression KOR boolexpression
+          ;
+
+boolexpression: simple_expression
+              | simple_expression relop simple_expression
+              ;
+
+simple_expression: term
+                 | simple_expression addop term
+                 ;
+
+term: factor
+    | addop %prec Uaddop
+    | term mulop factor
+    ;
+
+factor: IDENTIFIER tail
+      | IDENTIFIER LPAREN expression_list RPAREN
+      | NUM
+      | addop NUM
+      | STRINGCONST
+      | LPAREN expression RPAREN
+      | KNOT factor
+      ;
+
+addop: PLUS | MINUS;
+
+mulop: STAR | SLASH;
+
+relop: LESS | GREATER | EQUAL | LESSEQUAL | GREATEREQUAL | NOTEQUAL;
 
 %%
 
@@ -76,7 +204,7 @@ int main(int argc, const char *argv[]) {
     FILE *fp = argc == 1 ? stdin : fopen(argv[1], "r");
 
     if(fp == NULL)
-        fprintf( stderr, "Open file error\n" ), exit(-1);
+        fprintf(stderr, "Open file error\n" ), exit(-1);
 
     yyin = fp;
     yyparse();
