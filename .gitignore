@@ -14,3 +14,5 @@ scanner.o
 scanner.d
 ## handin file
 510557011-parser.zip
+# VS Code files
+.vscode/
