@@ -5,7 +5,6 @@
 
 #include "loc.h"
 #include "ast.h"
-#include "error.h"
 
 #define YYLTYPE LocType
 
@@ -18,11 +17,7 @@ extern int yyleng;
 
 static Node root = NULL;
 
-extern
-#ifdef __cplusplus
-"C"
-#endif
-int yylex(void);
+extern int yylex(void);
 static void yyerror(const char *msg);
 extern int yylex_destroy(void);
 
@@ -64,7 +59,7 @@ extern int yylex_destroy(void);
   Node node;
 }
 
-%type <node> prog
+%type <node> program
 
 %%
 
