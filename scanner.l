@@ -39,9 +39,10 @@ void scannerLog(const char* format, ...) {
 
 %option nounput
 %option noinput
+%option noyywrap
 
 INTEGER [0-9]+
-REAL {INTEGER}("."0*{INTEGER})?
+REAL {INTEGER}("."0*{INTEGER})
 SCIENTIFIC {REAL}(?i:e)[+-]?{INTEGER}
 NQUOTE [^']
 ALPHA [a-zA-Z]
@@ -67,7 +68,9 @@ IDENTIFIER {ALPHA}|{ALPHA}{ALNUMUNDER}*{ALPHANUM}
 (?i:array)                    { LOG(KEYWORD); return(KARRAY); }
 "["                           { LOG(KEYWORD); return(LBRAC); }
 "]"                           { LOG(KEYWORD); return(RBRAC); }
-({REAL}|{SCIENTIFIC})         { LOG(NUMBER); return(NUM); }
+{INTEGER}                     { LOG(NUMBER); sscanf(yytext, "%d", &yylval.val); return(INTEGER); }
+{REAL}                        { LOG(NUMBER); return(REAL); }
+{SCIENTIFIC}                  { LOG(NUMBER); return(SCIENTIFIC); }
 (?i:string)                   { LOG(KEYWORD); return(KSTRING); }
 \"([^"])*\"                   { LOG(STRING); return(STRINGCONST); }
 (?i:of)                       { LOG(KEYWORD); return(KOF); }
@@ -98,7 +101,7 @@ IDENTIFIER {ALPHA}|{ALPHA}{ALNUMUNDER}*{ALPHANUM}
 (?i:and)                      { LOG(KEYWORD); return(KAND); }
 (?i:or)                       { LOG(KEYWORD); return(KOR); }
 
-{IDENTIFIER}                  { LOG(IDENTIFIER); return(IDENTIFIER); }
+{IDENTIFIER}                  { LOG(IDENTIFIER); yylval.text = strdup(yytext); return(IDENTIFIER); }
 
 "//".*                        { LIST; scannerLog("[INFO ] line%5d:%3lu comment string\n", line_no, col_no - yyleng); }
 "/*"                          { LIST; BEGIN(CXXCOMMENT); commentStack=1; 

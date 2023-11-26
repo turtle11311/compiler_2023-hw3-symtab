@@ -1,12 +1,12 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdint>
+#include <iostream>
 
-#include "loc.h"
+#include "location.h"
 #include "ast.h"
-
-#define YYLTYPE LocType
+#define YYLTYPE Location
 
 #define MAX_LINE_LENG      256
 extern int line_no, col_no, opt_list;
@@ -15,7 +15,7 @@ extern FILE *yyin;        /* declared by lex */
 extern char *yytext;      /* declared by lex */
 extern int yyleng;
 
-static Node root = NULL;
+Node *root = NULL;
 
 extern int yylex(void);
 static void yyerror(const char *msg);
@@ -31,6 +31,9 @@ extern int yylex_destroy(void);
 %token KARRAY
 %token LBRAC RBRAC
 %token NUM
+%token REAL
+%token INTEGER
+%token SCIENTIFIC
 %token KSTRING
 %token STRINGCONST
 %token KOF
@@ -52,14 +55,29 @@ extern int yylex_destroy(void);
 %left STAR SLASH
 %left Uaddop
 
-%union {
-  int val;
-  char* text;
-  double dval;
-  Node node;
+%code requires {
+    #include "ast.h"
+    #include "declaration.h"
+    #include "type.h"
+    #include <iostream>
+    using std::cout, std::endl;
 }
 
-%type <node> program
+%union {
+  int val;
+  char *text;
+  std::list<std::string> *text_list_p;
+  double dval;
+  Type *type_p;
+
+  DeclarationNodeList *decl_list_p;
+}
+
+%type <text> IDENTIFIER
+%type <val> INTEGER
+%type <text_list_p> identifier_list
+%type <type_p> standard_type type
+%type <decl_list_p> declarations
 
 %%
 
@@ -71,6 +89,9 @@ program: KPROGRAM IDENTIFIER LPAREN identifier_list RPAREN SEMICOLON
          DOT
         {
             root = NULL;
+            for (auto decl: *$7) {
+                cout << decl->getName() << " " << decl->getType()->name() << endl;
+            }
             /*
             printf("program node is @ line: %d, column: %d\n",
                         @1.first_line, @1.first_column);
@@ -78,19 +99,28 @@ program: KPROGRAM IDENTIFIER LPAREN identifier_list RPAREN SEMICOLON
             */
         };
 
-identifier_list: IDENTIFIER 
-               | identifier_list COMMA IDENTIFIER
+identifier_list: IDENTIFIER { $$ = new std::list<std::string>(); $$->emplace_back($1); }
+               | identifier_list COMMA IDENTIFIER { $$->emplace_back($3); }
                ;
 
 declarations: declarations KVAR identifier_list COLON type SEMICOLON
-            |
+            {
+                for (auto &id : *$3) {
+                    $1->emplace_back(new DeclarationNode($5, id));
+                }
+                $$ = $1;
+            }
+            | { $$ = new DeclarationNodeList(); }
             ;
 
-type: standard_type
-    | KARRAY LBRAC NUM DOTDOT NUM RBRAC KOF type
+type: standard_type { $$ = $1; }
+    | KARRAY LBRAC INTEGER DOTDOT INTEGER RBRAC KOF type { $$ = new ArrayType($8, $3, $5); }
     ;
 
-standard_type: KINTEGER | KREAL | KSTRING;
+standard_type: KINTEGER {$$ = new StandardType(StandardTypeEnum::Integer); } 
+             | KREAL {$$ = new StandardType(StandardTypeEnum::Real); } 
+             | KSTRING{$$ = new StandardType(StandardTypeEnum::String); } 
+             ;
 
 subprogram_declarations: subprogram_declarations subprogram_declaration SEMICOLON
                        |
@@ -100,6 +130,11 @@ subprogram_declaration: subprogram_head
                         declarations
                         subprogram_declarations
                         compound_statement
+                        {
+                            for (auto decl: *$2) {
+                                cout << decl->getName() << " " << decl->getType()->name() << endl;
+                            }
+                        }
                       ;
 
 subprogram_head: KFUNCTION IDENTIFIER arguments COLON standard_type SEMICOLON
@@ -170,11 +205,16 @@ term: factor
 
 factor: IDENTIFIER tail
       | IDENTIFIER LPAREN expression_list RPAREN
-      | NUM
-      | addop NUM
+      | number
+      | addop number
       | STRINGCONST
       | LPAREN expression RPAREN
       | KNOT factor
+      ;
+
+number: INTEGER
+      | REAL
+      | SCIENTIFIC
       ;
 
 addop: PLUS | MINUS;

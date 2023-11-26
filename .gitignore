@@ -3,15 +3,10 @@
 test/output
 ## parser
 parser
-parser.o
-parser.c
-parser.h
-parser.d
 parser.output
-## scanner
-scanner.c
-scanner.o
-scanner.d
+
+## objs
+obj/
 ## handin file
 510557011-parser.zip
 # VS Code files

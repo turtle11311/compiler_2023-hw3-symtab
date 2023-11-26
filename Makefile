@@ -7,7 +7,7 @@ YACC    = bison
 LIBS    = -lfl
 
 EXEC    = $(PARSER)
-SRCS    = $(PARSER) $(SCANNER) $(basename $(notdir $(wildcard lib/*.c)))
+SRCS    = $(PARSER) $(SCANNER) $(basename $(notdir $(wildcard lib/*.cpp)))
 DEPS := $(SRCS:=.d)
 OBJS := $(SRCS:%=obj/%.o)
 OBJDIR  = obj
@@ -26,7 +26,7 @@ $(OBJDIR):
 
 $(OBJS): $(OBJDIR)
 
-$(OBJDIR)/%.o: $(LIBDIR)/%.c
+$(OBJDIR)/%.o: $(LIBDIR)/%.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 
