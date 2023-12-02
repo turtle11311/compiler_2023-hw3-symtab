@@ -9,7 +9,6 @@ SubprogramNode::SubprogramNode(SubprogramNode *subprogram_head, DeclarationNodeL
 decl_list(decl_list), subprogram_list(subprogram_list)
 {
     // clear old subprogram_head
-    subprogram_head->id = nullptr;
     subprogram_head->args_decl_list = nullptr;
     subprogram_head->ret_type = nullptr;
 }

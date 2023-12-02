@@ -20,6 +20,7 @@ void PrintAstVisitor::visit(DeclarationNode *decl_node) {
 }
 
 void PrintAstVisitor::visit(SubprogramNode *subprogram_node) {
-    cout << "subprogram: " << subprogram_node->id << endl;
+    auto ret_type = subprogram_node->ret_type;
+    cout << "subprogram: " << subprogram_node->id << (ret_type != nullptr ? " return type: " + ret_type->name() : "" ) << endl;
     subprogram_node->accept(this);
 }
