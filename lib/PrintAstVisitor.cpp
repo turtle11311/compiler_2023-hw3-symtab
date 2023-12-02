@@ -1,4 +1,4 @@
-#include "visitor.h"
+#include "PrintAstVisitor.h"
 #include "program.h"
 #include "subprogram.h"
 #include "declaration.h"
@@ -7,7 +7,7 @@
 using std::cout, std::endl;
 
 void PrintAstVisitor::visit(ProgramNode *program_node) {
-    cout << "program: " << program_node->name << endl;
+    cout << "program: " << program_node->id << endl;
     program_node->accept(this);
 }
 

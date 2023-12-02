@@ -8,11 +8,11 @@
 
 class ProgramNode : public Node {
     public:
-        ProgramNode(const std::string name, DeclarationNodeList *decl_list, SubprogramNodeList *subprogram_list);
+        ProgramNode(const std::string id, DeclarationNodeList *decl_list, SubprogramNodeList *subprogram_list);
         ~ProgramNode();
         void accept(AstVisitor *visitor);
 
-        std::string name;
+        std::string id;
         DeclarationNodeList *decl_list;
         SubprogramNodeList *subprogram_list;
 };

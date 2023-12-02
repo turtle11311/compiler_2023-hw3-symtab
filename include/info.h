@@ -1,6 +1,8 @@
 #ifndef __INFO_H__
 #define __INFO_H__
 
+#include <cstdio>
+
 /* stderr */
 #define REDEF_FUN "%d:%d: redefined function %s\n"
 #define REDEF_ARG "%d:%d: redefined argument %s\n"

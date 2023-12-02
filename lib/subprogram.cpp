@@ -1,4 +1,5 @@
 #include "subprogram.h"
+#include "AstVisitor.h"
 
 SubprogramNode::SubprogramNode(std::string id, DeclarationNodeList *args_decl_list, Type *ret_type)
  : id(id), args_decl_list(args_decl_list), ret_type(ret_type)

@@ -6,6 +6,7 @@
 
 #include "location.h"
 #include "program.h"
+#include "SymbolTable.h"
 #define YYLTYPE Location
 
 #define MAX_LINE_LENG      256
@@ -16,6 +17,7 @@ extern char *yytext;      /* declared by lex */
 extern int yyleng;
 
 ProgramNode *root = NULL;
+SymbolTable symtab;
 
 extern int yylex(void);
 static void yyerror(const char *msg);
@@ -57,7 +59,9 @@ extern int yylex_destroy(void);
 
 %code requires {
     #include "ast.h"
-    #include "visitor.h"
+    #include "PrintAstVisitor.h"
+    #include "SymbolAstVisitor.h"
+    #include "SymbolTable.h"
     #include "program.h"
     #include "subprogram.h"
     #include "declaration.h"
@@ -96,7 +100,7 @@ program: KPROGRAM IDENTIFIER LPAREN identifier_list RPAREN SEMICOLON
          DOT
         {
             root = new ProgramNode($2, $7, $8);
-            PrintAstVisitor p_visitor;
+            SymbolTableBuildVisitor p_visitor(&symtab);
             p_visitor.visit(root);
             
             delete root;

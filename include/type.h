@@ -35,4 +35,24 @@ class ArrayType : public Type {
         int from, to;
 };
 
+class FunctionType : public Type {
+    public:
+        FunctionType(Type *return_type, std::list<Type*> *arguments_type);
+        const std::string name() const;
+    
+    private:
+        std::list<Type*> *arguments_type;
+        Type *return_type;
+};
+
+class FunctionTypeBuilder {
+    public:
+        FunctionTypeBuilder* Argument(Type *arg);
+        FunctionTypeBuilder* Return(Type *ret);
+        FunctionType* Build();
+    private:
+        std::list<Type*> arguments_type;
+        Type *return_type;
+};
+
 #endif

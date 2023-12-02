@@ -2,7 +2,6 @@
 #define __SUBPROGRAM_H__
 
 #include "ast.h"
-#include "visitor.h"
 #include "declaration.h"
 #include "type.h"
 
