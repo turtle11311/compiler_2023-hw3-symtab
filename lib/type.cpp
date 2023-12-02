@@ -20,6 +20,8 @@ const std::string StandardType::name() const {
     return std::string("unknown");
 }
 
+StandardType::~StandardType() {}
+
 ArrayType::ArrayType(Type *base, int from, int to) 
 : base(base), from(from), to(to)
 {}
@@ -28,4 +30,8 @@ const std::string ArrayType::name() const {
     std::stringstream ss;
     ss << this->base->name() << "[" << from << "~" << to << "]";
     return ss.str();
+}
+
+ArrayType::~ArrayType() {
+    delete this->base;
 }

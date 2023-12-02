@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "location.h"
-#include "ast.h"
+#include "program.h"
 #define YYLTYPE Location
 
 #define MAX_LINE_LENG      256
@@ -15,7 +15,7 @@ extern FILE *yyin;        /* declared by lex */
 extern char *yytext;      /* declared by lex */
 extern int yyleng;
 
-Node *root = NULL;
+ProgramNode *root = NULL;
 
 extern int yylex(void);
 static void yyerror(const char *msg);
@@ -57,6 +57,9 @@ extern int yylex_destroy(void);
 
 %code requires {
     #include "ast.h"
+    #include "visitor.h"
+    #include "program.h"
+    #include "subprogram.h"
     #include "declaration.h"
     #include "type.h"
     #include <iostream>
@@ -71,13 +74,15 @@ extern int yylex_destroy(void);
   Type *type_p;
 
   DeclarationNodeList *decl_list_p;
+  SubprogramNode *subprogram;
 }
 
 %type <text> IDENTIFIER
 %type <val> INTEGER
 %type <text_list_p> identifier_list
 %type <type_p> standard_type type
-%type <decl_list_p> declarations
+%type <decl_list_p> declarations parameter_list arguments
+%type <subprogram> subprogram_declaration subprogram_head
 
 %%
 
@@ -88,15 +93,11 @@ program: KPROGRAM IDENTIFIER LPAREN identifier_list RPAREN SEMICOLON
          compound_statement
          DOT
         {
-            root = NULL;
-            for (auto decl: *$7) {
-                cout << decl->getName() << " " << decl->getType()->name() << endl;
-            }
-            /*
-            printf("program node is @ line: %d, column: %d\n",
-                        @1.first_line, @1.first_column);
-            yylval.val, yylval.text, yylval.dval to get the data (type defined in %union) you assigned by scanner.
-            */
+            root = new ProgramNode($2, $7);
+            PrintAstVisitor p_visitor;
+            p_visitor.visit(root);
+            
+            delete root;
         };
 
 identifier_list: IDENTIFIER { $$ = new std::list<std::string>(); $$->emplace_back($1); }
@@ -105,9 +106,7 @@ identifier_list: IDENTIFIER { $$ = new std::list<std::string>(); $$->emplace_bac
 
 declarations: declarations KVAR identifier_list COLON type SEMICOLON
             {
-                for (auto &id : *$3) {
-                    $1->emplace_back(new DeclarationNode($5, id));
-                }
+                $1->emplace_back(new DeclarationNode($5, *$3));
                 $$ = $1;
             }
             | { $$ = new DeclarationNodeList(); }
@@ -131,22 +130,19 @@ subprogram_declaration: subprogram_head
                         subprogram_declarations
                         compound_statement
                         {
-                            for (auto decl: *$2) {
-                                cout << decl->getName() << " " << decl->getType()->name() << endl;
-                            }
                         }
                       ;
 
-subprogram_head: KFUNCTION IDENTIFIER arguments COLON standard_type SEMICOLON
-               | KPROCEDURE IDENTIFIER arguments SEMICOLON
+subprogram_head: KFUNCTION IDENTIFIER arguments COLON standard_type SEMICOLON { $$ = new SubprogramNode($2, $3, $5); }
+               | KPROCEDURE IDENTIFIER arguments SEMICOLON { $$ = new SubprogramNode($2, $3, nullptr); }
                ;
 
-arguments: LPAREN parameter_list RPAREN
-         |
+arguments: LPAREN parameter_list RPAREN { $$ = $2; }
+         | { $$ = nullptr; }
          ;
 
-parameter_list: optional_var identifier_list COLON type
-              | optional_var identifier_list COLON type SEMICOLON parameter_list
+parameter_list: optional_var identifier_list COLON type { $$ = new DeclarationNodeList(); $$->emplace_back(new DeclarationNode($4, *$2)); }
+              | optional_var identifier_list COLON type SEMICOLON parameter_list { $$ = $6; $$->emplace_back(new DeclarationNode($4, *$2)); }
               ;
 
 optional_var: KVAR

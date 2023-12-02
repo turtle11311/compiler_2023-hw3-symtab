@@ -6,16 +6,22 @@
 #include <list>
 #include <string>
 
+typedef std::list<std::string> IdentifierList;
+
 class DeclarationNode : Node {
     public:
-        DeclarationNode(Type *type, const std::string name);
-        const Type *getType() const { return this->type; }
-        const std::string &getName() const { return this->name; }
-    private:
+        DeclarationNode(Type *type, const IdentifierList ids);
+        void accept(AstVisitor *visitor);
+
+        ~DeclarationNode();
+
         Type *type;
-        std::string name;
+        IdentifierList ids;
 };
 
-typedef std::list<DeclarationNode*> DeclarationNodeList;
+class DeclarationNodeList : public std::list<DeclarationNode*> {
+    public:
+        ~DeclarationNodeList();
+};
 
 #endif
