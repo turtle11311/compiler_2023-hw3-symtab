@@ -69,20 +69,22 @@ extern int yylex_destroy(void);
 %union {
   int val;
   char *text;
-  std::list<std::string> *text_list_p;
+  std::list<std::string> *text_list;
   double dval;
-  Type *type_p;
+  Type *type;
 
-  DeclarationNodeList *decl_list_p;
+  DeclarationNodeList *decl_list;
   SubprogramNode *subprogram;
+  SubprogramNodeList *subprogram_list;
 }
 
 %type <text> IDENTIFIER
 %type <val> INTEGER
-%type <text_list_p> identifier_list
-%type <type_p> standard_type type
-%type <decl_list_p> declarations parameter_list arguments
+%type <text_list> identifier_list
+%type <type> standard_type type
+%type <decl_list> declarations parameter_list arguments
 %type <subprogram> subprogram_declaration subprogram_head
+%type <subprogram_list> subprogram_declarations
 
 %%
 
@@ -93,7 +95,7 @@ program: KPROGRAM IDENTIFIER LPAREN identifier_list RPAREN SEMICOLON
          compound_statement
          DOT
         {
-            root = new ProgramNode($2, $7);
+            root = new ProgramNode($2, $7, $8);
             PrintAstVisitor p_visitor;
             p_visitor.visit(root);
             
@@ -121,8 +123,8 @@ standard_type: KINTEGER {$$ = new StandardType(StandardTypeEnum::Integer); }
              | KSTRING{$$ = new StandardType(StandardTypeEnum::String); } 
              ;
 
-subprogram_declarations: subprogram_declarations subprogram_declaration SEMICOLON
-                       |
+subprogram_declarations: subprogram_declarations subprogram_declaration SEMICOLON { $$ = $1; $$->emplace_back($2); }
+                       | { $$ = new SubprogramNodeList(); }
                        ;
  
 subprogram_declaration: subprogram_head
@@ -130,6 +132,7 @@ subprogram_declaration: subprogram_head
                         subprogram_declarations
                         compound_statement
                         {
+                            $$ = new SubprogramNode($1, $2, $3);
                         }
                       ;
 

@@ -1,4 +1,8 @@
 #include "visitor.h"
+#include "program.h"
+#include "subprogram.h"
+#include "declaration.h"
+
 #include <iostream>
 using std::cout, std::endl;
 
@@ -13,4 +17,9 @@ void PrintAstVisitor::visit(DeclarationNode *decl_node) {
         cout << id << ", ";
     }
     cout << endl;
+}
+
+void PrintAstVisitor::visit(SubprogramNode *subprogram_node) {
+    cout << "subprogram: " << subprogram_node->id << endl;
+    subprogram_node->accept(this);
 }
