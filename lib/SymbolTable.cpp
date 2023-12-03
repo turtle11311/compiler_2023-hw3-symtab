@@ -8,6 +8,7 @@ SymbolTable::SymbolTable(int layer)
 void SymbolTable::AddEntry(std::string name, Type *type)
 {
     this->symbols.emplace_front(SymbolEntry{name, type});
+    this->hash_table[name] = &this->symbols.front();
 }
 
 void SymbolTable::AppendChild(SymbolTable *symtab)
@@ -41,8 +42,11 @@ void SymbolTableManager::AddEntry(std::string name, Type *type)
     if (!this->symtab_stack.size()) {
         return;
     }
-    SHOW_NEWSYM(name.c_str());
     SymbolTable *symtab = this->symtab_stack.back();
+    if (symtab->hash_table.find(name) != symtab->hash_table.end()) {
+        return;
+    }
+    SHOW_NEWSYM(name.c_str());
     symtab->AddEntry(name, type);
 }
 

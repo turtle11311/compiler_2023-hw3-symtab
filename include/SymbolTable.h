@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "type.h"
 
@@ -24,6 +25,7 @@ class SymbolTable {
         SymbolTable(int layer);
         std::list<SymbolTable*> child_symtab;
         std::list<SymbolEntry> symbols;
+        std::map<std::string, SymbolEntry*> hash_table;
         int layer;
 };
 
