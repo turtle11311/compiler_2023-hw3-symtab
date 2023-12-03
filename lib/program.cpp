@@ -1,8 +1,11 @@
 #include "program.h"
 #include "AstVisitor.h"
+#include "type.h"
 
 ProgramNode::ProgramNode(const std::string id, DeclarationNodeList *decl_list, SubprogramNodeList *subprogram_list)
-: id(id), decl_list(decl_list), subprogram_list(subprogram_list) {}
+: id(id), decl_list(decl_list), subprogram_list(subprogram_list) {
+    signature = FunctionTypeBuilder().Return(nullptr)->Build();
+}
 
 void ProgramNode::accept(AstVisitor *visitor) {
     if (this->decl_list != nullptr) {

@@ -1,5 +1,7 @@
 #include "type.h"
 #include <sstream>
+#include <iterator>
+#include <utility>
 
 StandardType::StandardType(StandardTypeEnum t)
 : type(t)
@@ -36,7 +38,7 @@ ArrayType::~ArrayType() {
     delete this->base;
 }
 
-FunctionType::FunctionType(Type *return_type, std::list<Type *> *arguments_type)
+FunctionType::FunctionType(Type *return_type, std::vector<Type *> *arguments_type)
  : return_type(return_type), arguments_type(arguments_type)
 {
 }
@@ -49,8 +51,8 @@ const std::string FunctionType::name() const
         return ss.str();
     }
     ss <<" (";
-    for (auto it = this->arguments_type->begin(); it != this->arguments_type->end(); ++it) {
-        ss << (*it)->name() << ", ";
+    for (int i = 0; i != arguments_type->size(); ++i) {
+        ss << (*arguments_type)[i]->name() << ((i != arguments_type->size() - 1) ? ", " : "");
     }
     ss << ")";
     return ss.str();
@@ -65,6 +67,9 @@ FunctionTypeBuilder *FunctionTypeBuilder::Argument(Type *arg)
 FunctionTypeBuilder *FunctionTypeBuilder::Return(Type *ret)
 {
     this->return_type = ret;
+    if (ret == nullptr) {
+       this->return_type = new VoidType(); 
+    }
     return this;
 }
 
@@ -73,6 +78,10 @@ FunctionType *FunctionTypeBuilder::Build()
     if (this->arguments_type.size() == 0) {
         return new FunctionType(this->return_type, nullptr);
     }
-    return new FunctionType(this->return_type, new std::list<Type*>(this->arguments_type));
+    return new FunctionType(this->return_type, new std::vector<Type*>(this->arguments_type));
 }
 
+const std::string VoidType::name() const
+{
+    return std::string("void");
+}

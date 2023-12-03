@@ -15,6 +15,7 @@ class ProgramNode : public Node {
         std::string id;
         DeclarationNodeList *decl_list;
         SubprogramNodeList *subprogram_list;
+        Type *signature;
 };
 
 #endif

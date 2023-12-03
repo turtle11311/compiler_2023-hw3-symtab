@@ -6,12 +6,12 @@
 
 class SymbolTableBuildVisitor : public AstVisitor {
     public:
-        SymbolTableBuildVisitor(SymbolTable *symtab);
+        SymbolTableBuildVisitor(SymbolTableManager *symtab_manager);
         void visit(ProgramNode *program_node);
         void visit(DeclarationNode *decl_node);
         void visit(SubprogramNode *subprogram_node);
     private:
-        SymbolTable *symtab;
+        SymbolTableManager *symtab_manager;
 };
 
 #endif

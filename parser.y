@@ -17,7 +17,7 @@ extern char *yytext;      /* declared by lex */
 extern int yyleng;
 
 ProgramNode *root = NULL;
-SymbolTable symtab;
+SymbolTableManager symtab_manager;
 
 extern int yylex(void);
 static void yyerror(const char *msg);
@@ -100,9 +100,9 @@ program: KPROGRAM IDENTIFIER LPAREN identifier_list RPAREN SEMICOLON
          DOT
         {
             root = new ProgramNode($2, $7, $8);
-            SymbolTableBuildVisitor p_visitor(&symtab);
+            SymbolTableBuildVisitor p_visitor(&symtab_manager);
             p_visitor.visit(root);
-            
+
             delete root;
         };
 

@@ -3,6 +3,7 @@
 
 #include "ast.h"
 #include <string>
+#include <vector>
 
 class Type {
     public:
@@ -35,13 +36,19 @@ class ArrayType : public Type {
         int from, to;
 };
 
+class VoidType : public Type {
+    public:
+        const std::string name() const;
+        ~VoidType() = default;
+};
+
 class FunctionType : public Type {
     public:
-        FunctionType(Type *return_type, std::list<Type*> *arguments_type);
+        FunctionType(Type *return_type, std::vector<Type*> *arguments_type);
         const std::string name() const;
     
     private:
-        std::list<Type*> *arguments_type;
+        std::vector<Type*> *arguments_type;
         Type *return_type;
 };
 
@@ -51,7 +58,7 @@ class FunctionTypeBuilder {
         FunctionTypeBuilder* Return(Type *ret);
         FunctionType* Build();
     private:
-        std::list<Type*> arguments_type;
+        std::vector<Type*> arguments_type;
         Type *return_type;
 };
 

@@ -23,6 +23,7 @@ class SubprogramNode : public Node {
         DeclarationNodeList *decl_list;
         SubprogramNodeList *subprogram_list;
         Type *ret_type;
+        Type *signature;
 };
 
 
