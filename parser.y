@@ -148,8 +148,8 @@ arguments: LPAREN parameter_list RPAREN { $$ = $2; }
          | { $$ = nullptr; }
          ;
 
-parameter_list: optional_var identifier_list COLON type { $$ = new DeclarationNodeList(); $$->emplace_back(new DeclarationNode($4, *$2)); }
-              | optional_var identifier_list COLON type SEMICOLON parameter_list { $$ = $6; $$->emplace_back(new DeclarationNode($4, *$2)); }
+parameter_list: optional_var identifier_list COLON type { $$ = new DeclarationNodeList(); $$->emplace_front(new DeclarationNode($4, *$2)); }
+              | optional_var identifier_list COLON type SEMICOLON parameter_list { $$ = $6; $$->emplace_front(new DeclarationNode($4, *$2)); }
               ;
 
 optional_var: KVAR
